@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block title %}PhishGuard — Email Simulator{% endblock %}
+
+{% block head %}
+<style>
+.sim-layout { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; padding: 0 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+
+/* Email client mock */
+.email-client { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--bg-2); }
+.email-client-header {
+  background: var(--bg-3); padding: 0.75rem 1rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.email-client-dots { display: flex; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-r { background: #ff3d5a; } .dot-y { background: #ffb800; } .dot-g { background: #00ff9d; }
+.email-client-title { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); flex: 1; text-align: center; }
+
+.email-list { border-right: 1px solid var(--border); min-width: 0; }
+.email-list-header { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.email-list-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; }
+
+.email-item {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.email-item:hover { background: var(--bg-3); }
+.email-item.active { background: var(--bg-3); border-left: 2px solid var(--cyan); }
+.email-item.answered-correct { border-left: 2px solid var(--green); }
+.email-item.answered-wrong   { border-left: 2px solid var(--red); }
+
+.email-item-from { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; display: flex; justify-content: space-between; }
+.email-item-subject { font-size: 0.8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.email-item-time { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted-2); }
+
+/* Email viewer */
+.email-viewer { flex: 1; display: flex; flex-direction: column; }
+.email-viewer-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+.email-subject-line { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
+.email-meta { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; font-size: 0.85rem; }
+.email-meta-key { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+.email-meta-val { font-size: 0.85rem; color: var(--white); }
+.email-body-area { padding: 1.5rem; font-size: 0.9rem; line-height: 1.8; color: #c8d8e8; white-space: pre-wrap; flex: 1; }
+.email-actions { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; }
+
+/* Result panel */
+.result-panel {
+  margin: 1rem 1.5rem; padding: 1.25rem; border-radius: 3px;
+  animation: fadeUp 0.3s ease;
+}
+.result-panel.correct { background: var(--green-dim); border: 1px solid var(--green); }
+.result-panel.wrong   { background: var(--red-dim);   border: 1px solid var(--red); }
+.result-title { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+.result-title.correct { color: var(--green); }
+.result-title.wrong   { color: var(--red); }
+.result-explanation { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
+
+.flags-list { list-style: none; }
+.flags-list li {
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border); color: var(--muted);
+  display: flex; align-items: flex-start; gap: 0.5rem;
+}
+.flags-list li::before { content: '→'; flex-shrink: 0; }
+.flags-list.red li::before { color: var(--red); }
+.flags-list.green li::before { color: var(--green); }
+.flags-list li:last-child { border-bottom: none; }
+
+/* Sidebar */
+.sim-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+.score-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+.score-ring-wrap { display: flex; justify-content: center; margin: 1rem 0; position: relative; }
+.score-ring-wrap svg { width: 120px; height: 120px; }
+.score-ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.score-ring-num { font-family: var(--font-mono); font-size: 1.8rem; color: var(--cyan); font-weight: 700; }
+.score-ring-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); }
+
+.tips-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; padding: 1.25rem; flex: 1; }
+.tips-header { font-family: var(--font-mono); font-size: 0.7rem; color: var(--cyan); letter-spacing: 0.1em; margin-bottom: 1rem; }
+.tip-item { padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); line-height: 1.4; display: flex; gap: 0.5rem; }
+.tip-item:last-child { border-bottom: none; }
+.tip-bullet { color: var(--cyan); flex-shrink: 0; }
+
+.empty-state { padding: 4rem 2rem; text-align: center; }
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+.empty-text { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header container">
+  <div class="page-tag">Module 01</div>
+  <h1 class="page-title">Email <span>Simulator</span></h1>
+  <p class="page-desc">Analyze each email and decide: phishing attempt or legitimate message? Read carefully — attackers are good at deception.</p>
+</div>
+
+<div class="sim-layout">
+  <!-- Email Client -->
+  <div class="email-client">
+    <div class="email-client-header">
+      <div class="email-client-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <span class="email-client-title">INBOX — Training Simulation</span>
+      <button class="btn btn-ghost" id="reload-btn" style="padding:0.3rem 0.8rem; font-size:0.65rem;">↺ New Batch</button>
+    </div>
+    <div style="display:grid; grid-template-columns: 280px 1fr; height: 680px;">
+      <!-- List -->
+      <div id="email-list" class="email-list" style="overflow-y:auto;">
+        <div class="email-list-header">
+          <span class="email-list-label">INBOX (loading...)</span>
+        </div>
+        <div class="empty-state"><div class="empty-icon">📬</div><div class="empty-text">Loading emails...</div></div>
+      </div>
+      <!-- Viewer -->
+      <div id="email-viewer" class="email-viewer">
+        <div class="empty-state" style="margin:auto;">
+          <div class="empty-icon">👆</div>
+          <div class="empty-text">Select an email to analyze</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sim-sidebar">
+    <div class="score-card">
+      <div class="card-label" style="margin-bottom:0.5rem;">SESSION SCORE</div>
+      <div class="score-ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--bg-3)" stroke-width="8"/>
+          <circle id="score-ring" cx="60" cy="60" r="52" fill="none" stroke="var(--cyan)" stroke-width="8"
+            stroke-dasharray="326.7" stroke-dashoffset="326.7" stroke-linecap="round"
+            transform="rotate(-90 60 60)" style="transition: stroke-dashoffset 0.6s ease; filter: drop-shadow(0 0 6px var(--cyan));"/>
+        </svg>
+        <div class="score-ring-center">
+          <div class="score-ring-num" id="score-pct">0%</div>
+          <div class="score-ring-label" id="score-count">0/0</div>
+        </div>
+      </div>
+      <div id="badge-display" style="text-align:center; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted);">Answer emails to earn a badge</div>
+    </div>
+
+    <div class="tips-card">
+      <div class="tips-header">// QUICK DETECTION TIPS</div>
+      <div class="tip-item"><span class="tip-bullet">01</span>Read sender domain character by character — lookalikes use 0 for o, rn for m</div>
+      <div class="tip-item"><span class="tip-bullet">02</span>Hover links before clicking — destination URL reveals true target</div>
+      <div class="tip-item"><span class="tip-bullet">03</span>Urgency + threats = manipulation tactic. Slow down.</div>
+      <div class="tip-item"><span class="tip-bullet">04</span>Generic greetings ('Dear Customer') indicate mass phishing</div>
+      <div class="tip-item"><span class="tip-bullet">05</span>Legit companies never ask for passwords via email</div>
+      <div class="tip-item"><span class="tip-bullet">06</span>Check HTTPS AND the domain — phishers use valid SSL certificates</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let emails = [];
+let answers = {};
+let score = { correct: 0, total: 0 };
+let currentId = null;
+
+async function loadEmails() {
+  const res = await fetch('/api/emails?mode=mixed&count=6');
+  emails = await res.json();
+  answers = {};
+  score = { correct: 0, total: 0 };
+  renderList();
+  updateScore();
+  document.getElementById('email-viewer').innerHTML = `
+    <div class="empty-state" style="margin:auto;">
+      <div class="empty-icon">👆</div>
+      <div class="empty-text">Select an email to analyze</div>
+    </div>`;
+}
+
+function renderList() {
+  const list = document.getElementById('email-list');
+  list.innerHTML = `<div class="email-list-header"><span class="email-list-label">INBOX (${emails.length} emails)</span></div>`;
+  emails.forEach(e => {
+    const ans = answers[e.id];
+    let cls = currentId === e.id ? 'active' : '';
+    if (ans !== undefined) cls += ans.correct ? ' answered-correct' : ' answered-wrong';
+    list.innerHTML += `
+      <div class="email-item ${cls}" onclick="selectEmail(${e.id})">
+        <div class="email-item-from">
+          <span>${e.from_name}</span>
+          <span class="email-item-time">${e.time}</span>
+        </div>
+        <div class="email-item-subject">${e.subject}</div>
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted-2);margin-top:0.2rem;">${e.from_email}</div>
+      </div>`;
+  });
+}
+
+function selectEmail(id) {
+  currentId = id;
+  const e = emails.find(x => x.id === id);
+  if (!e) return;
+  const ans = answers[id];
+  renderList();
+
+  const viewer = document.getElementById('email-viewer');
+  let resultHtml = '';
+  if (ans) {
+    const cls = ans.correct ? 'correct' : 'wrong';
+    const title = ans.correct ? '✓ CORRECT — ' + (ans.answer ? 'PHISHING DETECTED' : 'LEGITIMATE EMAIL') : '✗ INCORRECT';
+    const flagsTitle = ans.answer ? 'Red Flags' : 'Trust Indicators';
+    const flags = ans.answer ? ans.red_flags : ans.trust_indicators;
+    const listCls = ans.answer ? 'red' : 'green';
+    resultHtml = `
+      <div class="result-panel ${cls}">
+        <div class="result-title ${cls}">${title}</div>
+        <div class="result-explanation">${ans.explanation}</div>
+        ${flags && flags.length ? `
+          <div style="font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.5rem;">${flagsTitle.toUpperCase()}:</div>
+          <ul class="flags-list ${listCls}">
+            ${flags.map(f => `<li>${f}</li>`).join('')}
+          </ul>` : ''}
+      </div>`;
+  }
+
+  const actionHtml = ans ? '' : `
+    <div class="email-actions">
+      <button class="btn btn-danger" onclick="submitAnswer(${id}, true)">🎣 This is Phishing</button>
+      <button class="btn btn-success" onclick="submitAnswer(${id}, false)">✓ Looks Legitimate</button>
+    </div>`;
+
+  viewer.innerHTML = `
+    <div class="email-viewer-header">
+      <div class="email-subject-line">${e.subject}</div>
+      <div class="email-meta">
+        <span class="email-meta-key">FROM</span><span class="email-meta-val">${e.from_name} &lt;${e.from_email}&gt;</span>
+        <span class="email-meta-key">TIME</span><span class="email-meta-val">${e.time}</span>
+      </div>
+    </div>
+    ${resultHtml}
+    <div class="email-body-area">${e.body}</div>
+    ${actionHtml}
+  `;
+}
+
+async function submitAnswer(id, isPhish) {
+  const res = await fetch('/api/check_email', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ id, answer: isPhish })
+  });
+  const data = await res.json();
+  answers[id] = data;
+  score.total++;
+  if (data.correct) score.correct++;
+  updateScore();
+  selectEmail(id);
+}
+
+function updateScore() {
+  const pct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('score-count').textContent = `${score.correct}/${score.total}`;
+  const circumference = 326.7;
+  document.getElementById('score-ring').style.strokeDashoffset = circumference - (pct / 100) * circumference;
+
+  if (score.total > 0) {
+    const badges = [
+      [90, '🛡️ Elite Analyst', 'var(--green)'],
+      [75, '🔍 Threat Hunter', 'var(--cyan)'],
+      [60, '⚡ Security Aware', 'var(--amber)'],
+      [0,  '📚 Keep Training', 'var(--muted)']
+    ];
+    const badge = badges.find(b => pct >= b[0]);
+    document.getElementById('badge-display').innerHTML = `<span style="color:${badge[2]}">${badge[0]} ${badge[1]}</span>`;
+  }
+}
+
+document.getElementById('reload-btn').addEventListener('click', loadEmails);
+loadEmails();
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PhishGuard{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/main.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="scan-lines"></div>
+  <div class="noise-overlay"></div>
+
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-text">PHISH<span class="logo-accent">GUARD</span></span>
+      <span class="logo-bracket">]</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+      <a href="/simulator" class="nav-link {% if request.endpoint == 'simulator' %}active{% endif %}">Simulator</a>
+      <a href="/quiz" class="nav-link {% if request.endpoint == 'quiz' %}active{% endif %}">Quiz</a>
+      <a href="/threats" class="nav-link {% if request.endpoint == 'threats' %}active{% endif %}">Threat Intel</a>
+      <a href="/dashboard" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+    </div>
+    <div class="nav-status">
+      <span class="status-dot"></span>
+      <span class="status-text">SYSTEM ONLINE</span>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="mono">PHISHGUARD v1.0 // Built for Cybersecurity Awareness</span>
+      <span class="mono footer-right">OWASP TOP 10 ALIGNED // EDUCATIONAL PURPOSE</span>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

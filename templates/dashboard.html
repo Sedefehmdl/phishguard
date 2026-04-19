@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}PhishGuard — Threat Dashboard{% endblock %}
+
+{% block head %}
+<style>
+.dashboard-wrap { padding: 0 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+
+.stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+.strip-stat { background: var(--bg-2); padding: 1.5rem; position: relative; overflow: hidden; }
+.strip-stat::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--cyan); transform: scaleX(0); transition: transform 0.3s; transform-origin: left; }
+.strip-stat:hover::after { transform: scaleX(1); }
+.strip-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.strip-num { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--cyan); line-height: 1; }
+.strip-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 0.4rem; }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+
+.dash-panel { background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.panel-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--bg-3); display: flex; justify-content: space-between; align-items: center; }
+.panel-title { font-family: var(--font-mono); font-size: 0.75rem; color: var(--white); letter-spacing: 0.05em; }
+.panel-subtitle { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); }
+.panel-body { padding: 1.25rem; }
+
+/* Bar chart */
+.bar-chart { display: flex; flex-direction: column; gap: 0.6rem; }
+.bar-row { display: flex; align-items: center; gap: 0.75rem; }
+.bar-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); width: 120px; flex-shrink: 0; text-align: right; }
+.bar-track { flex: 1; height: 8px; background: var(--bg-3); border-radius: 2px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; box-shadow: 0 0 6px; }
+.bar-pct { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); width: 36px; text-align: right; }
+
+/* Donut chart */
+.donut-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 1.5rem; }
+.donut-wrap svg { width: 100%; height: 100%; }
+.donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.donut-total { font-family: var(--font-mono); font-size: 1.5rem; color: var(--cyan); font-weight: 700; }
+.donut-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); }
+.donut-legend { display: flex; flex-direction: column; gap: 0.5rem; }
+.legend-item { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-pct { margin-left: auto; color: var(--white); }
+
+/* Trend chart */
+.trend-chart { position: relative; height: 140px; }
+.trend-chart svg { width: 100%; height: 100%; }
+
+/* Sector risks */
+.sector-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.sector-row { display: flex; align-items: center; gap: 0.75rem; }
+.sector-name { font-family: var(--font-mono); font-size: 0.72rem; color: var(--white); width: 90px; }
+.sector-bar-track { flex: 1; height: 6px; background: var(--bg-3); border-radius: 3px; overflow: hidden; }
+.sector-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+.sector-pct { font-family: var(--font-mono); font-size: 0.7rem; width: 36px; text-align: right; }
+
+/* Live ticker */
+.ticker { overflow: hidden; height: 2rem; position: relative; }
+.ticker-inner { display: flex; gap: 3rem; animation: ticker 25s linear infinite; white-space: nowrap; }
+.ticker-item { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
+.ticker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); box-shadow: 0 0 4px var(--red); }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.live-badge { display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.65rem; color: var(--red); }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse-dot 1s infinite; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header container">
+  <div class="page-tag">Module 04</div>
+  <h1 class="page-title">Threat <span>Dashboard</span></h1>
+  <p class="page-desc">Global cybersecurity threat landscape. Attack distribution, sector risk analysis, and breach trend data.</p>
+</div>
+
+<div class="dashboard-wrap">
+
+  <!-- Live ticker -->
+  <div class="dash-panel" style="margin-bottom:1.5rem;">
+    <div class="panel-header">
+      <span class="panel-title">// THREAT INTELLIGENCE FEED</span>
+      <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+    </div>
+    <div class="panel-body" style="padding:0.75rem 1.25rem;">
+      <div class="ticker">
+        <div class="ticker-inner" id="ticker-inner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats-strip" id="stats-strip">
+    <div class="strip-stat">
+      <div class="strip-icon">📧</div>
+      <div class="strip-num" id="stat-emails">–</div>
+      <div class="strip-label">Phishing emails per day</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-icon">💥</div>
+      <div class="strip-num" id="stat-breaches">–</div>
+      <div class="strip-label">Data breaches in 2023</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-icon">💰</div>
+      <div class="strip-num" id="stat-cost">–</div>
+      <div class="strip-label">Average breach cost</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-icon">🛡️</div>
+      <div class="strip-num" id="stat-mfa">–</div>
+      <div class="strip-label">Attacks blocked by MFA</div>
+    </div>
+  </div>
+
+  <!-- Row 1 -->
+  <div class="dash-grid" style="margin-bottom:1.5rem;">
+    <div class="dash-panel">
+      <div class="panel-header">
+        <span class="panel-title">Attack Vector Distribution</span>
+        <span class="panel-subtitle">2024</span>
+      </div>
+      <div class="panel-body">
+        <div class="bar-chart" id="attack-bars"></div>
+      </div>
+    </div>
+    <div class="dash-panel">
+      <div class="panel-header">
+        <span class="panel-title">Attack Share Breakdown</span>
+        <span class="panel-subtitle">By Type</span>
+      </div>
+      <div class="panel-body" style="display:flex;gap:2rem;align-items:center;">
+        <div class="donut-wrap" id="donut-wrap">
+          <svg viewBox="0 0 160 160" id="donut-svg"></svg>
+          <div class="donut-center">
+            <div class="donut-total">100%</div>
+            <div class="donut-label">ATTACKS</div>
+          </div>
+        </div>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="dash-grid" style="margin-bottom:1.5rem;">
+    <div class="dash-panel">
+      <div class="panel-header">
+        <span class="panel-title">Monthly Attack Trend</span>
+        <span class="panel-subtitle">May – Dec 2024</span>
+      </div>
+      <div class="panel-body">
+        <div class="trend-chart"><svg id="trend-svg"></svg></div>
+      </div>
+    </div>
+    <div class="dash-panel">
+      <div class="panel-header">
+        <span class="panel-title">Sector Risk Index</span>
+        <span class="panel-subtitle">By Industry</span>
+      </div>
+      <div class="panel-body">
+        <div class="sector-list" id="sector-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom terminal -->
+  <div class="dash-panel">
+    <div class="panel-header">
+      <span class="panel-title">// ANALYST TERMINAL</span>
+      <span class="panel-subtitle">READ-ONLY</span>
+    </div>
+    <div class="panel-body">
+      <div class="terminal">
+        <div class="terminal-body" id="terminal-output"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const COLORS = ['#00e5ff','#00ff9d','#ffb800','#ff3d5a','#a855f7','#f97316'];
+
+async function loadDashboard() {
+  const res = await fetch('/api/stats');
+  const data = await res.json();
+  renderStats(data.global);
+  renderBars(data.attack_distribution);
+  renderDonut(data.attack_distribution);
+  renderTrend(data.monthly_trend);
+  renderSectors(data.sectors);
+  renderTicker();
+  renderTerminal(data);
+}
+
+function renderStats(g) {
+  document.getElementById('stat-emails').textContent = '3.4B+';
+  document.getElementById('stat-breaches').textContent = g.data_breaches_2023.toLocaleString();
+  document.getElementById('stat-cost').textContent = '$4.45M';
+  document.getElementById('stat-mfa').textContent = g.mfa_blocks_attacks_pct + '%';
+}
+
+function renderBars(dist) {
+  const el = document.getElementById('attack-bars');
+  el.innerHTML = dist.map((d, i) => `
+    <div class="bar-row">
+      <span class="bar-label">${d.type}</span>
+      <div class="bar-track">
+        <div class="bar-fill" data-width="${d.percentage}" style="width:0%;background:${COLORS[i]};box-shadow:0 0 6px ${COLORS[i]}"></div>
+      </div>
+      <span class="bar-pct">${d.percentage}%</span>
+    </div>`).join('');
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.width + '%'; });
+  }, 100);
+}
+
+function renderDonut(dist) {
+  const svg = document.getElementById('donut-svg');
+  const legend = document.getElementById('donut-legend');
+  const cx = 80, cy = 80, r = 60, sw = 22;
+  const circ = 2 * Math.PI * r;
+  let cumulative = 0;
+  let circles = '';
+  dist.forEach((d, i) => {
+    const frac = d.percentage / 100;
+    const dash = frac * circ;
+    const gap = circ - dash;
+    const offset = circ * (1 - cumulative);
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${COLORS[i]}" stroke-width="${sw}"
+      stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${offset}"
+      transform="rotate(-90 ${cx} ${cy})" style="filter:drop-shadow(0 0 4px ${COLORS[i]})"/>`;
+    cumulative += frac;
+  });
+  svg.innerHTML = circles;
+  legend.innerHTML = dist.map((d, i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${COLORS[i]}"></div>
+      <span>${d.type}</span>
+      <span class="legend-pct">${d.percentage}%</span>
+    </div>`).join('');
+}
+
+function renderTrend(trend) {
+  const svg = document.getElementById('trend-svg');
+  const W = 600, H = 130;
+  const vals = trend.map(t => t.attacks);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const pad = { l: 10, r: 10, t: 10, b: 30 };
+  const xStep = (W - pad.l - pad.r) / (trend.length - 1);
+  const yScale = v => H - pad.b - ((v - min) / (max - min)) * (H - pad.t - pad.b);
+  const pts = trend.map((t, i) => [pad.l + i * xStep, yScale(t.attacks)]);
+
+  let path = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const cpx = (pts[i-1][0] + pts[i][0]) / 2;
+    path += ` C ${cpx} ${pts[i-1][1]} ${cpx} ${pts[i][1]} ${pts[i][0]} ${pts[i][1]}`;
+  }
+  const area = path + ` L ${pts[pts.length-1][0]} ${H-pad.b} L ${pts[0][0]} ${H-pad.b} Z`;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${area}" fill="url(#tg)"/>
+    <path d="${path}" fill="none" stroke="#00e5ff" stroke-width="2" style="filter:drop-shadow(0 0 4px #00e5ff)"/>
+    ${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#00e5ff" style="filter:drop-shadow(0 0 4px #00e5ff)"/>`).join('')}
+    ${trend.map((t, i) => `<text x="${pts[i][0]}" y="${H-8}" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="#4a6070">${t.month}</text>`).join('')}
+  `;
+}
+
+function renderSectors(sectors) {
+  const colors = ['#ff3d5a','#ff6400','#ffb800','#f0c040','#00e5ff','#00ff9d'];
+  document.getElementById('sector-list').innerHTML = sectors.map((s, i) => `
+    <div class="sector-row">
+      <span class="sector-name">${s.name}</span>
+      <div class="sector-bar-track">
+        <div class="sector-bar-fill" data-w="${s.risk}" style="width:0%;background:${colors[i]};box-shadow:0 0 5px ${colors[i]}"></div>
+      </div>
+      <span class="sector-pct" style="color:${colors[i]}">${s.risk}%</span>
+    </div>`).join('');
+  setTimeout(() => {
+    document.querySelectorAll('.sector-bar-fill').forEach(b => { b.style.width = b.dataset.w + '%'; });
+  }, 200);
+}
+
+function renderTicker() {
+  const items = [
+    '🔴 Phishing campaign targeting Hungarian banking sector detected',
+    '🟡 New credential stuffing toolkit released on dark web forums',
+    '🔴 Critical SQLi vulnerability disclosed in popular CMS platform',
+    '🟡 Ransomware group LockBit claims new victim in manufacturing sector',
+    '🔴 Zero-day exploit for Windows NTLM under active exploitation',
+    '🟠 BEC attacks up 45% in Q4 targeting finance departments',
+    '🔴 Malicious npm package with 100K weekly downloads flagged',
+    '🟡 Phishing kit mimicking Microsoft 365 login distributed via Telegram'
+  ];
+  const doubled = [...items, ...items];
+  const inner = document.getElementById('ticker-inner');
+  inner.innerHTML = doubled.map(t => `<span class="ticker-item"><span class="ticker-dot"></span>${t}</span>`).join('');
+}
+
+function renderTerminal(data) {
+  const lines = [
+    { type: 'cmd', text: '$ phishguard --threat-summary --year 2024' },
+    { type: 'output', text: '' },
+    { type: 'highlight', text: '[SUMMARY] Global Cyber Threat Landscape Report' },
+    { type: 'output', text: `  Total recorded data breaches : ${data.global.data_breaches_2023.toLocaleString()}` },
+    { type: 'output', text: `  Phishing emails sent daily   : 3,400,000,000+` },
+    { type: 'output', text: `  Average breach cost (USD)    : $4,450,000` },
+    { type: 'output', text: `  Ransomware attacks / day     : ${data.global.ransomware_attacks_per_day.toLocaleString()}` },
+    { type: 'output', text: '' },
+    { type: 'cmd', text: '$ phishguard --top-vectors' },
+    { type: 'output', text: '' },
+    ...data.attack_distribution.map((d, i) => ({
+      type: i === 0 ? 'highlight' : 'output',
+      text: `  [${String(i+1).padStart(2,'0')}] ${d.type.padEnd(25)} ${d.percentage}%`
+    })),
+    { type: 'output', text: '' },
+    { type: 'cmd', text: '$ phishguard --recommendation' },
+    { type: 'output', text: '' },
+    { type: 'highlight', text: '  ✓ Enable MFA on all accounts (blocks 99% of attacks)' },
+    { type: 'output', text: '  ✓ Use unique passwords + password manager' },
+    { type: 'output', text: '  ✓ Verify sender domains before clicking any link' },
+    { type: 'output', text: '  ✓ Keep systems patched and updated' },
+    { type: 'output', text: '  ✓ Implement security awareness training quarterly' },
+    { type: 'output', text: '' },
+    { type: 'cmd', text: '$ _' },
+  ];
+  const out = document.getElementById('terminal-output');
+  out.innerHTML = lines.map(l => `<div class="${l.type}">${l.text || '&nbsp;'}</div>`).join('');
+}
+
+loadDashboard();
+</script>
+{% endblock %}

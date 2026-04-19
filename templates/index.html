@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}PhishGuard — Cybersecurity Awareness Platform{% endblock %}
+
+{% block head %}
+<style>
+.hero {
+  min-height: calc(100vh - 65px);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 4rem 2rem;
+  max-width: 1200px; margin: 0 auto;
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-eyebrow::after { content: ''; flex: 0 0 40px; height: 1px; background: var(--cyan); }
+
+.hero-headline {
+  font-size: clamp(3rem, 8vw, 6rem); font-weight: 800;
+  line-height: 1.0; letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+.hero-headline .line1 { display: block; color: var(--white); animation: fadeUp 0.6s 0.1s ease both; opacity: 0; }
+.hero-headline .line2 { display: block; color: var(--cyan); animation: fadeUp 0.6s 0.2s ease both; opacity: 0; text-shadow: 0 0 60px var(--cyan-dim); }
+.hero-headline .line3 { display: block; color: var(--muted); font-size: 0.5em; font-weight: 400; letter-spacing: 0.05em; animation: fadeUp 0.6s 0.3s ease both; opacity: 0; }
+
+.hero-desc {
+  max-width: 500px; color: var(--muted); font-size: 1.05rem; line-height: 1.7;
+  margin-bottom: 2.5rem; animation: fadeUp 0.6s 0.4s ease both; opacity: 0;
+}
+
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.5s ease both; opacity: 0; }
+
+.hero-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 5rem;
+  animation: fadeUp 0.6s 0.6s ease both; opacity: 0;
+}
+.hero-stat {
+  background: var(--bg-2); padding: 1.5rem;
+  position: relative; overflow: hidden;
+}
+.hero-stat::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--cyan); transform: scaleX(0); transition: transform 0.3s;
+  transform-origin: left;
+}
+.hero-stat:hover::after { transform: scaleX(1); }
+.hero-stat-num { font-family: var(--font-mono); font-size: 1.8rem; color: var(--cyan); font-weight: 700; }
+.hero-stat-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.25rem; }
+
+.features-section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+.section-header { margin-bottom: 3rem; }
+.section-tag {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--cyan);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-tag::before { content: '//'; color: var(--muted); }
+.section-title { font-size: 2.5rem; font-weight: 800; }
+
+.feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); }
+.feature-card {
+  background: var(--bg-2); padding: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: background 0.3s;
+}
+.feature-card:hover { background: var(--bg-3); }
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  transform: scaleX(0); transition: transform 0.5s;
+}
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-num {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);
+  letter-spacing: 0.1em; margin-bottom: 1.5rem;
+}
+.feature-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+.feature-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem; }
+.feature-desc { color: var(--muted); line-height: 1.6; font-size: 0.95rem; margin-bottom: 1.5rem; }
+.feature-link {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan);
+  text-decoration: none; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem;
+}
+.feature-link:hover { gap: 0.75rem; }
+
+.bg-grid {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.03;
+  background-image: linear-gradient(var(--cyan) 1px, transparent 1px), linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="bg-grid"></div>
+  <div class="hero-eyebrow">Cybersecurity Awareness Platform</div>
+  <h1 class="hero-headline">
+    <span class="line1">Don't Get</span>
+    <span class="line2">Hooked.</span>
+    <span class="line3">Learn to Identify Threats Before They Strike</span>
+  </h1>
+  <p class="hero-desc">
+    Train your instincts against phishing, social engineering, and web attacks. 
+    Interactive simulations backed by real-world OWASP threat intelligence.
+  </p>
+  <div class="hero-actions">
+    <a href="/simulator" class="btn btn-primary">▶ Start Simulator</a>
+    <a href="/quiz" class="btn btn-outline">Take the Quiz</a>
+    <a href="/dashboard" class="btn btn-ghost">View Dashboard</a>
+  </div>
+
+  <div class="hero-stats" id="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="3400000000">0</div>
+      <div class="hero-stat-label">Phishing emails / day</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="83">0</div>
+      <div class="hero-stat-label">% companies hit by phishing</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="4450000">0</div>
+      <div class="hero-stat-label">Avg breach cost ($)</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="99">0</div>
+      <div class="hero-stat-label">% attacks blocked by MFA</div>
+    </div>
+  </div>
+</div>
+
+<div class="features-section">
+  <div class="section-header">
+    <div class="section-tag">Platform Modules</div>
+    <h2 class="section-title">Train Like a <span class="glow">Security Analyst</span></h2>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card fade-up fade-up-1">
+      <div class="feature-num">01</div>
+      <span class="feature-icon">📧</span>
+      <h3 class="feature-name">Phishing Simulator</h3>
+      <p class="feature-desc">Analyze real-vs-fake email scenarios. Identify red flags, domain spoofing, and social engineering tactics used in actual attacks.</p>
+      <a href="/simulator" class="feature-link">Launch Simulator →</a>
+    </div>
+    <div class="feature-card fade-up fade-up-2">
+      <div class="feature-num">02</div>
+      <span class="feature-icon">🧠</span>
+      <h3 class="feature-name">Adaptive Quiz Engine</h3>
+      <p class="feature-desc">Test your knowledge across 3 difficulty levels. Questions cover OWASP Top 10, attack techniques, best practices, and incident response.</p>
+      <a href="/quiz" class="feature-link">Start Quiz →</a>
+    </div>
+    <div class="feature-card fade-up fade-up-3">
+      <div class="feature-num">03</div>
+      <span class="feature-icon">🗂️</span>
+      <h3 class="feature-name">Threat Intelligence</h3>
+      <p class="feature-desc">Deep-dive encyclopedia of attack types: phishing, ransomware, SQLi, XSS, MitM. Real-world examples, kill chains, and prevention techniques.</p>
+      <a href="/threats" class="feature-link">Browse Threats →</a>
+    </div>
+    <div class="feature-card fade-up fade-up-4">
+      <div class="feature-num">04</div>
+      <span class="feature-icon">📊</span>
+      <h3 class="feature-name">Live Threat Dashboard</h3>
+      <p class="feature-desc">Visualize the global threat landscape — attack distribution, sector risk levels, monthly breach trends, and key statistics.</p>
+      <a href="/dashboard" class="feature-link">Open Dashboard →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Animated counter
+function animateCount(el, target) {
+  const isLarge = target > 1000000;
+  const suffix = target >= 1000000000 ? 'B+' : target >= 1000000 ? 'M' : target > 100 ? '%' : '%';
+  const displayTarget = target >= 1000000000 ? (target/1000000000).toFixed(1) 
+                       : target >= 1000000 ? (target/1000000).toFixed(2) 
+                       : target;
+  let start = 0;
+  const duration = 2000;
+  const startTime = performance.now();
+  const update = (now) => {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = (eased * displayTarget);
+    el.textContent = (typeof displayTarget === 'number' && displayTarget % 1 !== 0)
+      ? current.toFixed(2) + suffix
+      : Math.floor(current) + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = displayTarget + suffix;
+  };
+  requestAnimationFrame(update);
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-target]').forEach(el => {
+        animateCount(el, parseInt(el.dataset.target));
+      });
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+observer.observe(document.getElementById('hero-stats'));
+</script>
+{% endblock %}

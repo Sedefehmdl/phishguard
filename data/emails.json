@@ -1,0 +1,146 @@
+[
+  {
+    "id": 1,
+    "is_phish": true,
+    "from_name": "PayPal Security Team",
+    "from_email": "security@paypa1-alerts.com",
+    "subject": "⚠️ URGENT: Your account has been limited",
+    "time": "2 minutes ago",
+    "body": "Dear Valued Customer,\n\nWe have detected unusual activity on your PayPal account. To avoid permanent suspension, you must verify your information within 24 hours.\n\nClick the link below to restore your account access immediately:\n\nhttps://paypal-secure-verify.com/restore?user=confirm\n\nFailure to respond will result in permanent account closure.\n\nPayPal Security Department",
+    "explanation": "This is a phishing email using urgency tactics and a spoofed sender domain ('paypa1' with a number 1 instead of letter l).",
+    "red_flags": [
+      "Sender domain is 'paypa1-alerts.com' not 'paypal.com'",
+      "Urgent language designed to create panic",
+      "Suspicious link leads to 'paypal-secure-verify.com' (not PayPal)",
+      "Threatens 'permanent closure' to pressure action",
+      "Generic greeting 'Valued Customer' instead of your name"
+    ],
+    "trust_indicators": []
+  },
+  {
+    "id": 2,
+    "is_phish": false,
+    "from_name": "GitHub",
+    "from_email": "noreply@github.com",
+    "subject": "Your pull request was merged",
+    "time": "1 hour ago",
+    "body": "Hi there,\n\nYour pull request #42 'Fix authentication bug' has been merged into main by octocat.\n\nView the pull request: https://github.com/your-repo/pull/42\n\nYou're receiving this because you're subscribed to this repository. Unsubscribe from these emails in your notification settings.\n\nGitHub, Inc.",
+    "explanation": "Legitimate GitHub notification. Sender is from the official github.com domain, link points to github.com, and content matches expected PR notifications.",
+    "red_flags": [],
+    "trust_indicators": [
+      "Sender domain is official 'github.com'",
+      "Link directs to 'github.com' domain",
+      "No urgency or threats",
+      "Contains specific PR details (number, title, merger)",
+      "Clear unsubscribe option provided"
+    ]
+  },
+  {
+    "id": 3,
+    "is_phish": true,
+    "from_name": "IT Helpdesk",
+    "from_email": "helpdesk@company-support-portal.net",
+    "subject": "Password expires TODAY - Reset required",
+    "time": "3 hours ago",
+    "body": "Hello Employee,\n\nYour corporate password will expire in 2 hours. All employees must reset their passwords through our new secure portal immediately.\n\nReset Password Now: http://reset.company-support-portal.net/reset\n\nIf you do not reset your password, you will be locked out of all company systems including email, VPN, and internal tools.\n\nIT Department",
+    "explanation": "Classic spear-phishing targeting corporate employees. The domain is not a company domain, uses HTTP instead of HTTPS, and creates artificial urgency.",
+    "red_flags": [
+      "Domain 'company-support-portal.net' is generic, not your company's domain",
+      "Uses HTTP instead of HTTPS — no encryption",
+      "Extreme urgency: '2 hours' to create panic",
+      "Generic greeting 'Hello Employee'",
+      "Threatens lockout from all systems simultaneously"
+    ],
+    "trust_indicators": []
+  },
+  {
+    "id": 4,
+    "is_phish": false,
+    "from_name": "Spotify",
+    "from_email": "no-reply@spotify.com",
+    "subject": "Your receipt from Spotify",
+    "time": "Yesterday",
+    "body": "Hi Sadaf,\n\nThanks for your payment. Here's your receipt:\n\nPremium Individual Plan - Monthly\nAmount: $9.99\nDate: November 14, 2024\nOrder #SP-2847361\n\nManage your subscription at spotify.com/account\n\nQuestions? Visit spotify.com/help\n\n© 2024 Spotify AB",
+    "explanation": "Legitimate Spotify receipt email. Uses official domain, addresses user by name, contains specific transaction details, and links only go to spotify.com.",
+    "red_flags": [],
+    "trust_indicators": [
+      "Official 'spotify.com' sender domain",
+      "Personalized greeting with real name",
+      "Specific order number and transaction details",
+      "All links point to 'spotify.com'",
+      "No requests for action or credentials"
+    ]
+  },
+  {
+    "id": 5,
+    "is_phish": true,
+    "from_name": "Microsoft Account Team",
+    "from_email": "account-alert@microsofft-security.com",
+    "subject": "Sign-in attempt from Russia - Action Required",
+    "time": "10 minutes ago",
+    "body": "Microsoft Account Alert\n\nUnusual sign-in activity detected!\n\nLocation: Moscow, Russia\nTime: 3:42 AM\nDevice: Unknown Windows PC\n\nIf this wasn't you, immediately secure your account:\n→ Click here to secure account\n\nIgnoring this alert may result in complete account compromise and data loss.\n\nMicrosoft Security",
+    "explanation": "Geo-scare phishing. The misspelled domain 'microsofft-security.com' gives it away. These emails exploit fear of unauthorized access to steal credentials.",
+    "red_flags": [
+      "Domain 'microsofft-security.com' — note double 'f' typo",
+      "Fear-based tactic using foreign location (Russia)",
+      "Vague 'Click here' link without showing destination",
+      "Threatens 'complete account compromise'",
+      "Middle-of-the-night timestamp to increase anxiety"
+    ],
+    "trust_indicators": []
+  },
+  {
+    "id": 6,
+    "is_phish": false,
+    "from_name": "LinkedIn",
+    "from_email": "messages-noreply@linkedin.com",
+    "subject": "Anna Schmidt viewed your profile",
+    "time": "2 hours ago",
+    "body": "Hi Sadaf,\n\nAnna Schmidt, Senior Recruiter at TechCorp Vienna, viewed your profile.\n\nSee who's viewed your profile: linkedin.com/in/you/who-viewed\n\nYou appear in 12 searches this week.\n\nLinkedIn Corporation, 1000 West Maude Avenue, Sunnyvale, CA 94085",
+    "explanation": "Legitimate LinkedIn notification. Official domain, contains specific viewer details, standard physical address in footer, and no suspicious requests.",
+    "red_flags": [],
+    "trust_indicators": [
+      "Official 'linkedin.com' sender domain",
+      "Specific person name and company mentioned",
+      "Link goes to 'linkedin.com'",
+      "Physical business address in footer",
+      "No login credentials requested"
+    ]
+  },
+  {
+    "id": 7,
+    "is_phish": true,
+    "from_name": "Amazon Customer Service",
+    "from_email": "orders@amazon-deliveries-tracking.info",
+    "subject": "Your order #114-8273645 could not be delivered",
+    "time": "30 minutes ago",
+    "body": "Dear Amazon Customer,\n\nWe attempted to deliver your package but were unable to complete delivery due to an incorrect address.\n\nYour package will be returned to sender in 48 hours unless you update your delivery details.\n\nUpdate Delivery Address: http://amazon-deliveries-tracking.info/update\n\nOrder total: $247.99\nItem: [Package Contents]\n\nAmazon Logistics",
+    "explanation": "Delivery-themed phishing. Amazon uses amazon.com, never third-party domains. The vague 'Package Contents' and generic format confirm this is fake.",
+    "red_flags": [
+      "Domain 'amazon-deliveries-tracking.info' — not amazon.com",
+      "Uses HTTP not HTTPS",
+      "Vague 'Package Contents' — real orders show item names",
+      "Fake urgency: 48-hour deadline",
+      "Link goes to suspicious third-party domain"
+    ],
+    "trust_indicators": []
+  },
+  {
+    "id": 8,
+    "is_phish": false,
+    "from_name": "Google",
+    "from_email": "no-reply@accounts.google.com",
+    "subject": "New sign-in to your Google Account",
+    "time": "5 minutes ago",
+    "body": "Hi Sadaf,\n\nYour Google Account was just signed in to from:\n\nDevice: Chrome on Windows\nLocation: Budapest, Hungary\nTime: Today, 2:15 PM\n\nIf this was you, you don't need to do anything.\n\nIf you didn't sign in, check your account activity:\nmyaccount.google.com/security\n\nThe Google Accounts Team",
+    "explanation": "Legitimate Google sign-in alert. Uses official accounts.google.com sender, provides non-urgent guidance, link goes to myaccount.google.com, and matches your actual location.",
+    "red_flags": [],
+    "trust_indicators": [
+      "Sender is official 'accounts.google.com'",
+      "No panic — says 'you don't need to do anything' if it was you",
+      "Security link goes to 'myaccount.google.com'",
+      "Location matches realistic scenario (Budapest)",
+      "No threats or credential requests"
+    ]
+  }
+]

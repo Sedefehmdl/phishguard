@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block title %}PhishGuard — Security Quiz{% endblock %}
+
+{% block head %}
+<style>
+.quiz-wrap { max-width: 800px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+.difficulty-selector { display: flex; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+.diff-btn { flex: 1; padding: 1rem; background: var(--bg-2); border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); transition: all 0.2s; }
+.diff-btn:hover { background: var(--bg-3); color: var(--white); }
+.diff-btn.active { background: var(--bg-3); color: var(--cyan); border-bottom: 2px solid var(--cyan); }
+.diff-btn .diff-icon { display: block; font-size: 1.2rem; margin-bottom: 0.3rem; }
+.diff-btn .diff-label { display: block; }
+.diff-btn .diff-desc { display: block; font-size: 0.6rem; color: var(--muted); margin-top: 0.2rem; }
+
+.quiz-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+  animation: fadeUp 0.3s ease;
+}
+.quiz-progress-wrap { padding: 0; }
+.quiz-progress-bar { height: 3px; background: var(--cyan); transition: width 0.4s ease; box-shadow: 0 0 8px var(--cyan); }
+
+.quiz-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.quiz-counter { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.quiz-difficulty-badge { }
+
+.quiz-question { padding: 2rem 1.5rem; font-size: 1.15rem; font-weight: 600; line-height: 1.6; }
+
+.quiz-options { padding: 0 1.5rem 1.5rem; display: grid; gap: 0.75rem; }
+.quiz-option {
+  padding: 1rem 1.25rem; background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: 3px; cursor: pointer; font-size: 0.9rem; line-height: 1.4;
+  transition: all 0.15s; text-align: left; color: var(--white); font-family: inherit;
+  display: flex; gap: 1rem; align-items: flex-start;
+}
+.quiz-option:hover:not(:disabled) { border-color: var(--cyan-mid); background: var(--bg-2); }
+.quiz-option.correct { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.quiz-option.wrong   { background: var(--red-dim);   border-color: var(--red);   color: var(--red); }
+.quiz-option.revealed { opacity: 0.5; cursor: default; }
+.option-letter { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); flex-shrink: 0; padding-top: 0.1rem; }
+
+.quiz-explanation {
+  margin: 0 1.5rem 1.5rem; padding: 1rem 1.25rem;
+  background: var(--bg); border: 1px solid var(--border-2); border-radius: 3px;
+  font-size: 0.85rem; color: var(--muted); line-height: 1.6;
+  font-family: var(--font-mono);
+  animation: fadeUp 0.3s ease;
+}
+.quiz-explanation-label { color: var(--cyan); margin-bottom: 0.5rem; font-size: 0.7rem; letter-spacing: 0.1em; }
+
+.quiz-nav { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+
+/* Results */
+.results-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; animation: fadeUp 0.5s ease; }
+.results-hero { padding: 3rem; text-align: center; border-bottom: 1px solid var(--border); background: var(--bg-3); }
+.results-score { font-family: var(--font-mono); font-size: 4rem; font-weight: 700; color: var(--cyan); text-shadow: 0 0 40px var(--cyan-mid); }
+.results-badge { font-size: 2rem; margin: 1rem 0 0.5rem; }
+.results-badge-name { font-family: var(--font-mono); font-size: 0.9rem; letter-spacing: 0.1em; }
+.results-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+.rb-item { background: var(--bg-2); padding: 1.25rem; text-align: center; }
+.rb-num { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; }
+.rb-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 0.25rem; }
+.results-actions { padding: 1.5rem; display: flex; gap: 0.75rem; justify-content: center; }
+
+/* Loading */
+.quiz-loading { padding: 4rem; text-align: center; }
+.loading-spinner { width: 40px; height: 40px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header container">
+  <div class="page-tag">Module 02</div>
+  <h1 class="page-title">Security <span>Quiz</span></h1>
+  <p class="page-desc">10 questions per session. Topics: OWASP Top 10, attack techniques, secure practices, and incident response.</p>
+</div>
+
+<div class="quiz-wrap">
+  <div id="difficulty-select">
+    <div class="difficulty-selector">
+      <button class="diff-btn" data-diff="easy" onclick="selectDiff('easy')">
+        <span class="diff-icon">🟢</span>
+        <span class="diff-label">EASY</span>
+        <span class="diff-desc">Core concepts & best practices</span>
+      </button>
+      <button class="diff-btn active" data-diff="medium" onclick="selectDiff('medium')">
+        <span class="diff-icon">🟡</span>
+        <span class="diff-label">MEDIUM</span>
+        <span class="diff-desc">Attack techniques & scenarios</span>
+      </button>
+      <button class="diff-btn" data-diff="hard" onclick="selectDiff('hard')">
+        <span class="diff-icon">🔴</span>
+        <span class="diff-label">HARD</span>
+        <span class="diff-desc">Technical payloads & deep concepts</span>
+      </button>
+    </div>
+    <div style="text-align:center;">
+      <button class="btn btn-primary" onclick="startQuiz()">▶ Start Quiz</button>
+    </div>
+  </div>
+
+  <div id="quiz-area" style="display:none;">
+    <div class="quiz-loading" id="quiz-loading">
+      <div class="loading-spinner"></div>
+      <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--muted);">Loading questions...</div>
+    </div>
+    <div id="quiz-content" style="display:none;"></div>
+    <div id="quiz-results" style="display:none;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let questions = [], currentQ = 0, sessionScore = 0, difficulty = 'medium';
+let qAnswers = [];
+
+function selectDiff(d) {
+  difficulty = d;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-diff="${d}"]`).classList.add('active');
+}
+
+async function startQuiz() {
+  document.getElementById('difficulty-select').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-loading').style.display = 'block';
+  document.getElementById('quiz-content').style.display = 'none';
+
+  const res = await fetch(`/api/quiz?difficulty=${difficulty}`);
+  questions = await res.json();
+  currentQ = 0; sessionScore = 0; qAnswers = [];
+
+  document.getElementById('quiz-loading').style.display = 'none';
+  document.getElementById('quiz-content').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (currentQ >= questions.length) { showResults(); return; }
+  const q = questions[currentQ];
+  const letters = ['A','B','C','D'];
+  const content = document.getElementById('quiz-content');
+  const pct = (currentQ / questions.length) * 100;
+
+  content.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-progress-wrap"><div class="quiz-progress-bar" style="width:${pct}%"></div></div>
+      <div class="quiz-header">
+        <span class="quiz-counter">QUESTION ${currentQ + 1} / ${questions.length}</span>
+        <span class="badge badge-${q.difficulty === 'easy' ? 'low' : q.difficulty === 'medium' ? 'medium' : 'high'}">${q.difficulty.toUpperCase()}</span>
+      </div>
+      <div class="quiz-question">${q.question}</div>
+      <div class="quiz-options" id="options">
+        ${q.options.map((opt, i) => `
+          <button class="quiz-option" onclick="answerQ(${q.id}, ${i})">
+            <span class="option-letter">${letters[i]}</span>
+            <span>${opt}</span>
+          </button>`).join('')}
+      </div>
+      <div id="explanation-area"></div>
+      <div class="quiz-nav" id="quiz-nav" style="display:none;">
+        <button class="btn btn-primary" onclick="nextQuestion()">
+          ${currentQ + 1 < questions.length ? 'Next Question →' : 'See Results →'}
+        </button>
+      </div>
+    </div>`;
+}
+
+async function answerQ(qid, chosen) {
+  const res = await fetch('/api/quiz/answer', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ id: qid, answer: chosen })
+  });
+  const data = await res.json();
+  const correct = data.correct;
+  if (correct) sessionScore++;
+  qAnswers.push({ qid, chosen, correct, correctAnswer: data.correct_answer });
+
+  // Disable all options
+  document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === chosen) btn.classList.add(correct ? 'correct' : 'wrong');
+    else if (i === data.correct_answer && !correct) btn.classList.add('correct');
+    else btn.classList.add('revealed');
+  });
+
+  document.getElementById('explanation-area').innerHTML = `
+    <div class="quiz-explanation">
+      <div class="quiz-explanation-label">// EXPLANATION</div>
+      ${data.explanation}
+    </div>`;
+  document.getElementById('quiz-nav').style.display = 'flex';
+}
+
+function nextQuestion() { currentQ++; renderQuestion(); }
+
+function showResults() {
+  document.getElementById('quiz-content').style.display = 'none';
+  const resultsEl = document.getElementById('quiz-results');
+  resultsEl.style.display = 'block';
+
+  const pct = Math.round((sessionScore / questions.length) * 100);
+  const badges = [
+    [90, '🛡️', 'Elite Analyst',    'var(--green)'],
+    [75, '🔍', 'Threat Hunter',    'var(--cyan)'],
+    [60, '⚡', 'Security Aware',   'var(--amber)'],
+    [40, '📚', 'Learning Mode',    'var(--muted)'],
+    [0,  '⚠️', 'Needs Training',  'var(--red)']
+  ];
+  const badge = badges.find(b => pct >= b[0]);
+
+  resultsEl.innerHTML = `
+    <div class="results-card">
+      <div class="results-hero">
+        <div class="results-score">${pct}%</div>
+        <div class="results-badge">${badge[1]}</div>
+        <div class="results-badge-name" style="color:${badge[3]}">${badge[2]}</div>
+      </div>
+      <div class="results-breakdown">
+        <div class="rb-item">
+          <div class="rb-num" style="color:var(--green)">${sessionScore}</div>
+          <div class="rb-label">Correct</div>
+        </div>
+        <div class="rb-item">
+          <div class="rb-num" style="color:var(--red)">${questions.length - sessionScore}</div>
+          <div class="rb-label">Incorrect</div>
+        </div>
+        <div class="rb-item">
+          <div class="rb-num" style="color:var(--cyan)">${questions.length}</div>
+          <div class="rb-label">Total</div>
+        </div>
+      </div>
+      <div class="results-actions">
+        <button class="btn btn-primary" onclick="location.reload()">↺ Try Again</button>
+        <a href="/threats" class="btn btn-outline">Browse Threats</a>
+      </div>
+    </div>`;
+}
+</script>
+{% endblock %}

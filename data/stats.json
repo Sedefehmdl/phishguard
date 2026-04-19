@@ -1,0 +1,36 @@
+{
+  "global": {
+    "phishing_emails_per_day": 3400000000,
+    "data_breaches_2023": 3205,
+    "avg_breach_cost_usd": 4450000,
+    "ransomware_attacks_per_day": 4000,
+    "companies_hit_by_phishing_pct": 83,
+    "mfa_blocks_attacks_pct": 99
+  },
+  "attack_distribution": [
+    {"type": "Phishing", "percentage": 36},
+    {"type": "Stolen Credentials", "percentage": 19},
+    {"type": "Ransomware", "percentage": 17},
+    {"type": "Insider Threat", "percentage": 11},
+    {"type": "Social Engineering", "percentage": 10},
+    {"type": "Other", "percentage": 7}
+  ],
+  "monthly_trend": [
+    {"month": "May",  "attacks": 2100},
+    {"month": "Jun",  "attacks": 2450},
+    {"month": "Jul",  "attacks": 2800},
+    {"month": "Aug",  "attacks": 3100},
+    {"month": "Sep",  "attacks": 3600},
+    {"month": "Oct",  "attacks": 4200},
+    {"month": "Nov",  "attacks": 5100},
+    {"month": "Dec",  "attacks": 6800}
+  ],
+  "sectors": [
+    {"name": "Finance",      "risk": 94},
+    {"name": "Healthcare",   "risk": 89},
+    {"name": "Government",   "risk": 85},
+    {"name": "Education",    "risk": 78},
+    {"name": "Technology",   "risk": 71},
+    {"name": "Retail",       "risk": 65}
+  ]
+}
