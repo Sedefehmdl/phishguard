@@ -190,7 +190,7 @@ Planned future enhancements:
 MSc Cybersecurity Student at Eötvös Loránd University (ELTE), Budapest  
 TryHackMe Top 8% Globally 
 
-- LinkedIn: [sadaf-ahmadli](https://linkedin.com/in/sadaf-ahmadli)
+- LinkedIn: [sadaf-ahmadli](https://www.linkedin.com/in/sadaf-ahmadli-4863a4233/)
 - GitHub: [Sedefehmdl](https://github.com/Sedefehmdl)
 - Behance: [sedefehmdl](https://behance.net/sedefehmdl)
 
