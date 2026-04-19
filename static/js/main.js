@@ -8,6 +8,31 @@ document.addEventListener('DOMContentLoaded', () => {
     a.classList.toggle('active', a.getAttribute('href') === path);
   });
 
+  // Mobile menu toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const navLinks = document.getElementById('nav-links');
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navLinks.classList.toggle('open');
+      menuToggle.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
+    });
+    // Close menu when clicking a link
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuToggle.textContent = '☰';
+      });
+    });
+    // Close menu on outside click
+    document.addEventListener('click', (e) => {
+      if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+        navLinks.classList.remove('open');
+        menuToggle.textContent = '☰';
+      }
+    });
+  }
+
   // Animate elements on scroll
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {

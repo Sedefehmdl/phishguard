@@ -19,7 +19,8 @@
       <span class="logo-text">PHISH<span class="logo-accent">GUARD</span></span>
       <span class="logo-bracket">]</span>
     </a>
-    <div class="nav-links">
+    <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="nav-links">
       <a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a>
       <a href="/simulator" class="nav-link {% if request.endpoint == 'simulator' %}active{% endif %}">Simulator</a>
       <a href="/quiz" class="nav-link {% if request.endpoint == 'quiz' %}active{% endif %}">Quiz</a>
